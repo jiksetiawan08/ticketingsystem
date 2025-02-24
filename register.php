@@ -1,5 +1,7 @@
 <?php
 session_start();
+require $_SERVER["DOCUMENT_ROOT"] . "/ts/url.php";
+
 ?> 
 
 <!DOCTYPE html>
@@ -279,7 +281,7 @@ session_start();
 
             const formData = new FormData(this);
 
-            fetch("http://192.168.43.161:8081/ts/backend_register.php", {
+            fetch("<?php echo $url; ?>/backend_register.php", {
                 method: "POST",
                 body: formData,
                 headers: {

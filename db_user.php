@@ -1,5 +1,6 @@
 <?php
 session_start();
+require $_SERVER["DOCUMENT_ROOT"] . "/ts/url.php";
 
 if (!isset($_SESSION['userEmail'])) {
     echo "<script>
@@ -178,7 +179,7 @@ if (!isset($_SESSION['userEmail'])) {
 
             const formData = new FormData(this);
 
-            fetch("http://10.0.3.214:8081/ts/backend_login.php", {
+            fetch("<?php echo $url; ?>/backend_login.php", {
                 method: "POST",
                 body: formData,
                 headers: {

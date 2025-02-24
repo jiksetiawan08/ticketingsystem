@@ -1,5 +1,6 @@
 <?php
 session_start(); 
+require $_SERVER["DOCUMENT_ROOT"] . "/ts/url.php";
 
 // Cek apakah pengguna sudah login
 if (!isset($_SESSION['userEmail'])) {
@@ -240,7 +241,7 @@ document.getElementById("ticketForm").addEventListener("submit", async function(
 
     const formData = new FormData(this);
     try {
-        const response = await fetch("http://192.168.43.161:8081/ts/save_ticket.php", {
+        const response = await fetch("<?php echo $url; ?>/save_ticket.php", {
             method: "POST",
             body: formData
         });
