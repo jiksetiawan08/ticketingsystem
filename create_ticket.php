@@ -1,3 +1,20 @@
+<?php
+session_start(); 
+
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['userEmail'])) {
+  echo "<script>
+      alert('Silakan login terlebih dahulu.');
+      window.location.href = 'login.php';
+  </script>";
+  exit();
+}
+
+// // Ambil data user dari session
+// $user_id = $_SESSION['user_id'] ?? ''; 
+// $nama = $_SESSION['nama'] ?? 'User';
+// ?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +25,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Include SweetAlert library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
       body {
         background-color: #f8f9fa;
@@ -91,42 +112,38 @@
     </style>
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
+  <div class="row">
         <!-- Sidebar -->
         <div class="col-md-2 sidebar">
-          <div class="logo-background">
-            <img src="Logo_AssistMe.png" class="logo" alt="Logo AssistMe" />
-          </div>
-          <div class="p-3">
-            <div class="d-flex align-items-center mb-3">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="User Avatar"
-                class="rounded-circle me-2"
-              />
-              <div>
-                <span>Santi</span>
-                <div class="text-success small">● Online</div>
-              </div>
+            <div class="logo-background">
+                <img src="Logo_AssistMe.png" class="logo" alt="Logo AssistMe" />
             </div>
-            <div class="menu-title">Helpdesk Menu</div>
-            <nav>
-              <ul class="list-unstyled">
-                <li>
-                  <a href="#"><i class="bi bi-house-door"></i> Dashboard</a>
-                </li>
-                <li>
-                  <a href="#"
-                    ><i class="bi bi-plus-circle"></i> Create New Ticket</a
-                  >
-                </li>
-                <li>
-                  <a href="#"><i class="bi bi-person-circle"></i> My Profile</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+            <div class="p-3">
+              <div class="d-flex align-items-center mb-3">
+                  <!-- <img
+                      src="https://via.placeholder.com/40"
+                      alt="User Avatar"
+                      class="rounded-circle me-2"
+                  /> -->
+                  <div>
+                      <!-- <span><?php echo htmlspecialchars($nama); ?></span> -->
+                  </div>
+              </div>
+                <div class="menu-title">Helpdesk Menu</div>
+                <nav>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="db_user.php" class="active"><i class="bi bi-house-door"></i>Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="create_ticket.php"><i class="bi bi-plus-circle"></i> Create New Ticket</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="bi bi-person-circle"></i> My Profile</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
 
         <!-- Content -->
@@ -135,18 +152,20 @@
           <div class="d-flex justify-content-between align-items-center mb-4">
             <!-- Create New Ticket Title -->
             <h5 class="mb-0">
-              <i class="bi bi-arrow-left"></i> Create New Ticket
+              <i ></i> Create New Ticket
             </h5>
             <!-- Logout Button -->
             <button class="btn btn-outline-danger btn-sm logout-btn">
               Logout
             </button>
           </div>
-          <form action="http://3.1.1.241:8081/ts/save_ticket.php>" method="POST" class="row g-4">
-            <div class="mb-3">
+          <form id="ticketForm" class="row g-4" enctype="multipart/form-data">
+          <input type="hidden" name="created_by" id="created_by" value="<?php echo $_SESSION["userEmail"]; ?>">  
+          <div class="mb-3">
               <label for="subject" class="form-label required">Subject</label>
               <input
                 type="text"
+                name="subject"
                 id="subject"
                 class="form-control"
                 placeholder="Enter subject"
@@ -155,7 +174,7 @@
             </div>
             <div class="mb-3">
               <label for="product" class="form-label required">Product</label>
-              <select id="product" class="form-select" required>
+              <select name="product" id="product" class="form-select" required>
                 <option value="" selected disabled>Select product</option>
                 <option value="cisea">CISEA</option>
                 <option value="ellipse">Ellipse</option>
@@ -168,8 +187,9 @@
             </div>
             <div class="mb-3">
               <label for="module" class="form-label required">Module</label>
-              <select id="module" class="form-select" required>
+              <select name="module" id="module" class="form-select" required>
                 <option value="" selected disabled>Select module</option>
+                <option value="nonmodule">Non Module</option>
                 <option value="finance">Finance</option>
                 <option value="payroll">Payroll</option>
                 <option value="leave">Leave</option>
@@ -177,7 +197,7 @@
             </div>
             <div class="mb-3">
               <label for="priority" class="form-label required">Priority</label>
-              <select id="priority" class="form-select" required>
+              <select name="priority" id="priority" class="form-select" required>
                 <option value="" selected disabled>Select priority</option>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -187,6 +207,7 @@
             <div class="mb-3">
               <label class="form-label required">Description</label>
               <textarea
+              name="description"
                 class="form-control"
                 rows="5"
                 placeholder="Type Here..."
@@ -195,9 +216,9 @@
             </div>
             <div class="mb-3">
               <label for="attachment" class="form-label required"
-                >Attachment (optional)</label
+                >Attachment </label
               >
-              <input type="file" id="attachment" class="form-control" />
+              <input type="file" name="attachment" id="attachment" class="form-control" />
               <div class="attachment-requirement">
                 *Upload requirements: Max 2MB, JPG/PNG only
               </div>
@@ -210,17 +231,40 @@
         </div>
       </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      document
-        .querySelector(".logout-btn")
-        .addEventListener("click", function () {
-          const confirmLogout = confirm("Are you sure you want to logout?");
-          if (confirmLogout) {
-            // Redirect to login page
-            window.location.href = "login.html";
-          }
+document.getElementById("ticketForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    try {
+        const response = await fetch("http://192.168.43.161:8081/ts/save_ticket.php", {
+            method: "POST",
+            body: formData
         });
-    </script>
-  </body>
+
+        const result = await response.json();
+        
+        Swal.fire({
+            icon: result.success ? "success" : "error",
+            title: result.success ? "Sukses" : "Gagal",
+            text: result.message
+        });
+
+        if (result.success) {
+            this.reset();
+        }
+    } catch (error) {
+        console.log(error)
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Terjadi kesalahan, coba lagi nanti!"
+        });
+    }
+});
+</script>
+</body>
 </html>
